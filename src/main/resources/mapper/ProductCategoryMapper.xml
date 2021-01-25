@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.sens.mapper.ProductCategoryMapper">
+    <resultMap id="BaseResultMap" type="com.example.sens.entity.ProductCategory">
+        <id column="id" property="id"></id>
+        <result column="name" property="name"></result>
+        <result column="store_id" property="storeId"></result>
+        <result column="count" property="count"></result>
+    </resultMap>
+
+    <select id="findByStoreId" resultMap="BaseResultMap">
+        SELECT
+            t.id,
+            t.NAME,
+            t.store_id,
+            ( SELECT count( * ) FROM t_product p WHERE p.product_category_id = t.id AND p.status = 0 AND p.del_flag = 0 ) AS count
+        FROM
+            t_product_category t
+        WHERE
+            t.store_id = #{storeId}
+            AND t.del_flag = 0
+    </select>
+</mapper>

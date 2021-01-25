@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.sens.mapper.OrderDetailMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.sens.entity.OrderDetail">
+        <id column="id" property="id"></id>
+        <result column="user_id" property="userId"></result>
+        <result column="product_id" property="productId"></result>
+        <result column="comment_status" property="commentStatus"></result>
+        <result column="create_time" property="createTime"></result>
+        <result column="comment_time" property="commentTime"></result>
+
+    </resultMap>
+
+</mapper>

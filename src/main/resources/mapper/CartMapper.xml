@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.sens.mapper.CartMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.sens.entity.Cart">
+        <id column="id" property="id"></id>
+        <result column="user_id" property="userId"></result>
+        <result column="product_id" property="productId"></result>
+        <result column="number" property="number"></result>
+
+        <association property="product" javaType="com.example.sens.entity.Product">
+            <id property="id" column="product_id"/>
+            <result property="title" column="product_title"/>
+            <result property="thumbnail" column="product_thumbnail"/>
+            <result property="price" column="product_price"/>
+            <result property="status" column="product_status"/>
+            <result property="stock" column="product_stock"/>
+        </association>
+    </resultMap>
+
+    <select id="findByUserId" resultMap="BaseResultMap">
+        SELECT
+            t.id, t.product_id, t.number, t.user_id,
+            p.title product_title, p.thumbnail product_thumbnail, p.price product_price,
+            p.status product_status, p.stock product_stock
+        FROM
+            t_cart t, t_product p
+        WHERE
+        t.user_id = #{userId} AND
+        p.id = t.product_id
+        AND t.del_flag = 0 AND p.del_flag = 0
+    </select>
+
+    <select id="findByIds" resultMap="BaseResultMap">
+        SELECT
+            t.id, t.product_id, t.number, t.user_id,
+            p.title product_title, p.thumbnail product_thumbnail, p.price product_price,
+            p.status product_status, p.stock product_stock
+        FROM
+            t_cart t, t_product p
+        <where>
+            t.id in (
+                <foreach collection="list" item="item" separator=",">
+                    #{item}
+                </foreach>
+            ) AND
+            p.id = t.product_id
+            AND t.del_flag = 0 AND p.del_flag = 0
+        </where>
+    </select>
+</mapper>

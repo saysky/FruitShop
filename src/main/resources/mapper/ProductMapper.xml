@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.sens.mapper.ProductMapper">
+
+
+    <resultMap id="BaseResultMap" type="com.example.sens.entity.Product">
+        <id column="id" property="id"></id>
+        <result column="title" property="title"></result>
+        <result column="content" property="content"></result>
+        <result column="status" property="status"></result>
+        <result column="price" property="price"></result>
+        <result column="stock" property="stock"></result>
+        <result column="sell_count" property="sellCount"></result>
+        <result column="thumbnail" property="thumbnail"></result>
+        <result column="create_time" property="createTime"></result>
+        <result column="store_id" property="storeId"></result>
+        <result column="system_category_id" property="systemCategoryId"></result>
+        <result column="product_category_id" property="productCategoryId"></result>
+        <result column="rate" property="rate"></result>
+        <result column="summary" property="summary"></result>
+
+        <association property="productCategory" javaType="com.example.sens.entity.ProductCategory">
+            <id property="id" column="product_category_id"/>
+            <result property="name" column="product_category_name"/>
+        </association>
+
+        <association property="systemCategory" javaType="com.example.sens.entity.SystemCategory">
+            <id property="id" column="system_category_id"/>
+            <result property="name" column="system_category_name"/>
+        </association>
+
+
+        <association property="store" javaType="com.example.sens.entity.Store">
+            <id property="id" column="store_id"/>
+            <result property="name" column="store_name"/>
+        </association>
+
+    </resultMap>
+
+    <update id="removeProductCategoryId">
+        UPDATE t_product SET product_category_id = NULL
+        WHERE product_category_id = #{value} AND del_flag = 0
+    </update>
+
+    <update id="removeSystemCategoryId">
+        UPDATE t_product SET system_category_id = NULL
+        WHERE system_category_id = #{value} AND del_flag = 0
+    </update>
+
+    <select id="findNewsBySystemCategoryId" resultMap="BaseResultMap">
+        SELECT
+            id, title, content, status, price, stock, sell_count, thumbnail, create_time, store_id, system_category_id, product_category_id, rate, summary
+        FROM
+            t_product
+        WHERE
+            system_category_id in ( select #{value} union SELECT id FROM t_system_category WHERE pid = #{value} )
+            AND STATUS = 0
+            AND stock > 0
+            AND del_flag = 0
+        ORDER BY
+            update_time DESC
+            LIMIT 4
+    </select>
+
+
+    <select id="findByCondition" resultMap="BaseResultMap">
+        SELECT
+        p.id, p.title, p.content, p.status, p.price, p.stock, p.sell_count, p.thumbnail, p.create_time, p.store_id,
+        p.system_category_id, p.product_category_id, p.rate, p.summary,
+        s.name store_name,
+        sc.name system_category_name,
+        pc.name product_category_name
+        FROM
+        t_product p
+        LEFT JOIN t_store s ON s.id = p.store_id AND s.del_flag = 0
+        LEFT JOIN t_system_category sc ON sc.id = p.system_category_id AND sc.del_flag = 0
+        LEFT JOIN t_product_category pc ON pc.id = p.product_category_id AND pc.del_flag = 0
+        <where>
+            <if test="condition.status != null and condition.status != -1">
+                p.status = #{condition.status} AND
+            </if>
+            <if test="condition.storeId != null and condition.storeId != -1">
+                p.store_id = #{condition.storeId} AND
+            </if>
+            <if test="condition.title != null and condition.title != ''">
+                p.title LIKE CONCAT('%', #{condition.title},'%') AND
+            </if>
+            <if test="condition.systemCategoryId != null and condition.systemCategoryId != -1">
+                p.system_category_id = #{condition.systemCategoryId} AND
+            </if>
+            <if test="condition.productCategoryId != null and condition.productCategoryId != -1">
+                p.product_category_id = #{condition.productCategoryId} AND
+            </if>
+            p.del_flag = 0
+        </where>
+        ORDER BY p.create_time DESC
+    </select>
+</mapper>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.sens.mapper.OrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.sens.entity.Order">
+        <id column="id" property="id"></id>
+        <result column="user_id" property="userId"></result>
+        <result column="address_id" property="addressId"></result>
+        <result column="status" property="status"></result>
+        <result column="total_price" property="totalPrice"></result>
+        <result column="address_real_name" property="addressRealName"></result>
+        <result column="address_phone" property="addressPhone"></result>
+        <result column="address_detail" property="addressDetail"></result>
+        <result column="create_time" property="createTime"></result>
+        <result column="pay_time" property="payTime"></result>
+        <result column="send_time" property="sendTime"></result>
+        <result column="receive_time" property="receiveTime"></result>
+
+        <association property="user" javaType="com.example.sens.entity.User">
+            <id property="id" column="user_id"/>
+            <result property="userDisplayName" column="user_display_name"/>
+        </association>
+
+        <association property="store" javaType="com.example.sens.entity.Store">
+            <id property="id" column="store_id"/>
+            <result property="name" column="store_name"/>
+        </association>
+
+        <collection property="orderDetailList" ofType="com.example.sens.entity.OrderDetail"
+                    javaType="java.util.ArrayList">
+            <id property="id" column="order_detail_id"/>
+            <result property="productId" column="product_id"/>
+            <result property="productName" column="product_name"/>
+            <result property="productPrice" column="product_price"/>
+            <result property="productThumbnail" column="product_thumbnail"/>
+            <result property="number" column="number"/>
+            <result property="commentStatus" column="comment_status"/>
+        </collection>
+    </resultMap>
+
+    <select id="findByCondition" resultMap="BaseResultMap">
+        SELECT
+        o.id, o.user_id, o.store_id, o.address_id, o.status, o.total_price, o.address_real_name, o.address_phone,
+        o.address_detail, o.create_time, o.pay_time, o.send_time, o.receive_time,
+        u.user_display_name,
+        s.name store_name, s.id store_id,
+        d.id order_detail_id, d.product_id, d.product_name, d.product_price, d.product_thumbnail, d.number,
+        d.comment_status
+        FROM
+        t_order o
+        LEFT JOIN t_user u ON o.user_id = u.id AND u.del_flag = 0
+        LEFT JOIN t_store s ON o.store_id = s.id AND s.del_flag = 0
+        LEFT JOIN t_order_detail d ON d.order_id = o.id AND d.del_flag =0
+        <where>
+            <if test="condition.userId != null and condition.userId != -1">
+                o.user_id = #{condition.userId} AND
+            </if>
+            <if test="condition.status != null and condition.status != -1">
+                o.status = #{condition.status} AND
+            </if>
+            <if test="condition.storeId != null and condition.storeId != -1">
+                o.store_id = #{condition.storeId} AND
+            </if>
+            o.del_flag = 0
+        </where>
+    </select>
+
+    <select id="findByStatusAndGTCreateTime" resultMap="BaseResultMap">
+        SELECT
+            o.id,
+            o.user_id,
+            o.store_id,
+            o.address_id,
+            o.STATUS,
+            o.total_price,
+            o.address_real_name,
+            o.address_phone,
+            o.address_detail,
+            o.create_time,
+            o.pay_time, o.send_time, o.receive_time
+        FROM
+          t_order o
+        WHERE
+          TIMESTAMPDIFF( MINUTE, o.create_time, now( ) ) > #{minute} and status = #{status} and del_flag = 0
+    </select>
+
+
+    <select id="findByStatusAndGTSendTime" resultMap="BaseResultMap">
+        SELECT
+            o.id,
+            o.user_id,
+            o.store_id,
+            o.address_id,
+            o.STATUS,
+            o.total_price,
+            o.address_real_name,
+            o.address_phone,
+            o.address_detail,
+            o.create_time,
+            o.pay_time, o.send_time, o.receive_time
+        FROM
+          t_order o
+        WHERE
+          TIMESTAMPDIFF( DAY, o.create_time, now( ) ) > #{day} and status = #{status} and del_flag = 0
+    </select>
+
+
+    <select id="findByStatusAndGTReceiveTime" resultMap="BaseResultMap">
+        SELECT
+            o.id,
+            o.user_id,
+            o.store_id,
+            o.address_id,
+            o.STATUS,
+            o.total_price,
+            o.address_real_name,
+            o.address_phone,
+            o.address_detail,
+            o.create_time,
+            o.pay_time, o.send_time, o.receive_time,
+            t.id order_detail_id ,t.product_id ,t.product_name ,
+            t.product_price ,t.product_thumbnail ,t.number ,comment_status
+        FROM
+          t_order o, t_order_detail t
+        WHERE
+          TIMESTAMPDIFF( DAY, o.create_time, now( ) ) > #{day} and o.status = #{status} and o.del_flag = 0
+          AND t.order_id = o.id AND t.comment_status = 0 AND t.del_flag = 0
+    </select>
+
+</mapper>
