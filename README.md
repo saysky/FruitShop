@@ -1,7 +1,7 @@
 # 商城系统
 基于SpringBoot实现的C2C水果商城系统。<br/>
 用户既可以作为会员买东西，也可以申请开店卖东西，类似淘宝。<br/>
-预览地址：[fruit.liuyanzhao.com](fruit.liuyanzhao.com) <br/>
+预览地址：[https://fruit.liuyanzhao.com](https://fruit.liuyanzhao.com) <br/>
 详细介绍地址：[2021原创 SpringBoot 的C2C水果商城系统](https://liuyanzhao.com/shop/1353566462320709633.html) <br/>
 
 # 功能介绍
