@@ -70,7 +70,7 @@ mail:
   smtp:
     host: smtp.qq.com
     username: 847064370@qq.com
-    password: vtvhcjsacnuubdaj
+    password: 
   from:
     name: VC水果商城
 
